@@ -1,24 +1,28 @@
 package dev.priyanshu.productserviceassignment.controllers;
 
+import dev.priyanshu.productserviceassignment.dtos.AddNewProductDTO;
+import dev.priyanshu.productserviceassignment.dtos.FakeStoreProductDTO;
+import dev.priyanshu.productserviceassignment.dtos.ProductDTO;
+import dev.priyanshu.productserviceassignment.models.Category;
 import dev.priyanshu.productserviceassignment.models.Product;
 import dev.priyanshu.productserviceassignment.service.FakeStoreProductServiceImpl;
+import dev.priyanshu.productserviceassignment.service.ProductServiceInterface;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/product")
 public class ProductController {
-    private final FakeStoreProductServiceImpl fakeStoreProductService;
+    private ProductServiceInterface productService;
 
 
-    public ProductController(FakeStoreProductServiceImpl fakeStoreProductService) {
-        this.fakeStoreProductService = fakeStoreProductService;
+    public ProductController(ProductServiceInterface productService) {
+        this.productService = productService;
     }
 
     // Get product
@@ -30,11 +34,53 @@ public class ProductController {
         );
 
         ResponseEntity<Product> response = new ResponseEntity<>(
-                fakeStoreProductService.getSingleProduct(productId),
+                productService.getSingleProduct(productId),
                 headers,
                 HttpStatus.OK
         );
         return response;
 
     }
+
+    @GetMapping()
+    public List<Product> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    @PostMapping()
+    public ResponseEntity<Product> addNewProduct(@RequestBody AddNewProductDTO addNewProductDTO) {
+        Product newProduct = productService.addNewProduct(addNewProductDTO);
+        ResponseEntity<Product> response = new ResponseEntity<>(newProduct, HttpStatus.OK);
+        return response;
+    }
+
+    @PatchMapping("/{productId}")
+    public Product updateProduct(@PathVariable("productId") Long productId, @RequestBody FakeStoreProductDTO fakeStoreProductDTO) {
+        Product product = new Product();
+        product.setId(productId);
+        product.setCategory(new Category());
+        product.getCategory().setName(fakeStoreProductDTO.getCategory());
+        product.setTitle(fakeStoreProductDTO.getTitle());
+        product.setPrice(fakeStoreProductDTO.getPrice());
+        product.setDescription(fakeStoreProductDTO.getDescription());
+//        product.setImage(fakeStoreProductDTO.getImage());
+
+        return productService.updateProduct(productId, product);
+    }
+
+    @PutMapping("/{productId}")
+    public Product replaceProduct(@PathVariable("productId") Long productId, @RequestBody FakeStoreProductDTO fakeStoreProductDTO) {
+        Product product = new Product();
+        product.setId(productId);
+        product.setCategory(new Category());
+        product.getCategory().setName(fakeStoreProductDTO.getCategory());
+        product.setTitle(fakeStoreProductDTO.getTitle());
+        product.setDescription(fakeStoreProductDTO.getDescription());
+        product.setPrice(fakeStoreProductDTO.getPrice());
+        product.setImage(fakeStoreProductDTO.getImage());
+
+        return productService.replaceProduct(productId, product);
+    }
+
+
 }
