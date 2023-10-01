@@ -8,13 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FakeStoreCategoryServiceImpl {
-    public List<Category> getAllCategories() {
-        List<FakeStoreProductDTO> fakeStoreProductDTO = fakeStoreClient.getAllProducts();
-        List<Product> products = new ArrayList<>();
-        for (FakeStoreProductDTO productDTO: fakeStoreProductDTO){
-            products.add(convertFakeStoreProductDTOToProduct(productDTO));
-        }
-        return products;
-    }
+
 
 }
